@@ -3,6 +3,7 @@ package com.listtest.listpractice;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -15,6 +16,8 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.facebook.drawee.view.SimpleDraweeView;
 
 import java.lang.String;
 import java.util.ArrayList;
@@ -178,7 +181,8 @@ public class MainActivity extends AppCompatActivity {
             }else{
                 viewHolder=(ViewHolder)convertView.getTag();
             }
-            viewHolder.pic.setImageBitmap((Bitmap)ds.list.get(position).get("pic"));
+            Uri uri = Uri.parse((String)ds.list.get(position).get("pic"));
+            viewHolder.pic.setImageURI(uri);
             viewHolder.text.setText((CharSequence)ds.list.get(position).get("text"));
             viewHolder.time.setText((CharSequence)ds.list.get(position).get("time"));
             viewHolder.more.setOnClickListener(this);
@@ -187,7 +191,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         class ViewHolder{
-            ImageView pic;
+            SimpleDraweeView pic;
             TextView text;
             TextView time;
             Button more;

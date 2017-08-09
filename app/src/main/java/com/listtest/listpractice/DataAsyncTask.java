@@ -55,8 +55,7 @@ class DataAsyncTask extends AsyncTask<Integer,Void,List<Map<String,Object>>> {
                 if(n>bingPic.getImages().size()){
                     for(i=n-5;i<bingPic.getImages().size();i++){
                         map=new HashMap<>();
-                        picsrc="http://cn.bing.com"+bingPic.getImages().get(i).getUrl();
-                        map.put("pic",getBitmap(picsrc));
+                        map.put("pic","http://cn.bing.com"+bingPic.getImages().get(i).getUrl());
                         map.put("text",bingPic.getImages().get(i).getCopyright());
                         map.put("time",bingPic.getImages().get(i).getStartdate());
                         list.add(map);
@@ -64,8 +63,7 @@ class DataAsyncTask extends AsyncTask<Integer,Void,List<Map<String,Object>>> {
                 }else{
                     for(i=n-5;i<n;i++){
                         map=new HashMap<>();
-                        picsrc="http://cn.bing.com"+bingPic.getImages().get(i).getUrl();
-                        map.put("pic",getBitmap(picsrc));
+                        map.put("pic","http://cn.bing.com"+bingPic.getImages().get(i).getUrl());
                         map.put("text",bingPic.getImages().get(i).getCopyright());
                         map.put("time",bingPic.getImages().get(i).getStartdate());
                         list.add(map);
