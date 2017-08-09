@@ -56,7 +56,7 @@ class DataAsyncTask extends AsyncTask<Integer,Void,List<Map<String,Object>>> {
                         map=new HashMap<>();
                         map.put("pic","http://cn.bing.com"+bingPic.getImages().get(i).getUrl());
                         map.put("text",bingPic.getImages().get(i).getCopyright());
-                        map.put("time",bingPic.getImages().get(i).getStartdate());
+                        map.put("time",bingPic.getImages().get(i).getEnddate());
                         list.add(map);
                     }
                 }else{
@@ -64,7 +64,7 @@ class DataAsyncTask extends AsyncTask<Integer,Void,List<Map<String,Object>>> {
                         map=new HashMap<>();
                         map.put("pic","http://cn.bing.com"+bingPic.getImages().get(i).getUrl());
                         map.put("text",bingPic.getImages().get(i).getCopyright());
-                        map.put("time",bingPic.getImages().get(i).getStartdate());
+                        map.put("time",bingPic.getImages().get(i).getEnddate());
                         list.add(map);
                     }
                 }
@@ -78,20 +78,6 @@ class DataAsyncTask extends AsyncTask<Integer,Void,List<Map<String,Object>>> {
         }finally {
             return list;
         }
-    }
-
-    private static Bitmap getBitmap(String path) throws IOException {
-
-        URL url = new URL(path);
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        conn.setConnectTimeout(5000);
-        conn.setRequestMethod("GET");
-        if (conn.getResponseCode() == 200){
-            InputStream inputStream = conn.getInputStream();
-            Bitmap bitmap = Bitmap.createScaledBitmap(BitmapFactory.decodeStream(inputStream),150,150,true);
-            return bitmap;
-        }
-        return null;
     }
 
     private String readStream(InputStream inputStream) throws IOException{

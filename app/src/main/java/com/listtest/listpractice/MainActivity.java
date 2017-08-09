@@ -2,6 +2,8 @@ package com.listtest.listpractice;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -15,14 +17,17 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.facebook.drawee.view.SimpleDraweeView;
-import com.scwang.smartrefresh.header.TaurusHeader;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
 import com.scwang.smartrefresh.layout.constant.SpinnerStyle;
 import com.scwang.smartrefresh.layout.footer.BallPulseFooter;
 import com.scwang.smartrefresh.layout.listener.OnLoadmoreListener;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.String;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -56,7 +61,6 @@ public class MainActivity extends AppCompatActivity {
 
         initEvent();
         initData();
-        myrefresher.finishRefresh(3000);
     }
 
     private void initEvent(){
@@ -219,6 +223,20 @@ public class MainActivity extends AppCompatActivity {
             android.app.AlertDialog dialog=builder.create();
             dialog.show();
             dialog.getButton(dialog.BUTTON_POSITIVE).setTextColor(R.color.sure);
+        }
+
+        private Bitmap getBitmap(String path) throws IOException {
+
+            URL url = new URL(path);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setConnectTimeout(5000);
+            conn.setRequestMethod("GET");
+            if (conn.getResponseCode() == 200){
+                InputStream inputStream = conn.getInputStream();
+                Bitmap bitmap = Bitmap.createScaledBitmap(BitmapFactory.decodeStream(inputStream),150,150,true);
+                return bitmap;
+            }
+            return null;
         }
     }
 }
