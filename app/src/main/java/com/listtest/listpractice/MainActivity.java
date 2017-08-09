@@ -1,18 +1,16 @@
 package com.listtest.listpractice;
 
+import android.app.DownloadManager;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,11 +21,8 @@ import com.scwang.smartrefresh.layout.footer.BallPulseFooter;
 import com.scwang.smartrefresh.layout.listener.OnLoadmoreListener;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.File;
 import java.lang.String;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -146,9 +141,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private class MyAdapter extends BaseAdapter implements View.OnClickListener
+    private class MyAdapter extends BaseAdapter
     {
         Context mContext;
+        DownloadButton btn;
         private LayoutInflater mInflater;
 
         private MyAdapter(Context mContext){
@@ -180,7 +176,7 @@ public class MainActivity extends AppCompatActivity {
                 viewHolder.pic=convertView.findViewById(R.id.item_pic);
                 viewHolder.text=convertView.findViewById(R.id.item_text);
                 viewHolder.time=convertView.findViewById(R.id.item_time);
-                viewHolder.more=convertView.findViewById(R.id.btn_more);
+                viewHolder.btn=convertView.findViewById(R.id.download_btn);
                 convertView.setTag(viewHolder);
             }else{
                 viewHolder=(ViewHolder)convertView.getTag();
@@ -189,7 +185,21 @@ public class MainActivity extends AppCompatActivity {
             viewHolder.pic.setImageURI(uri);
             viewHolder.text.setText((CharSequence)ds.list.get(position).get("text"));
             viewHolder.time.setText((CharSequence)ds.list.get(position).get("time"));
-            viewHolder.more.setOnClickListener(this);
+            viewHolder.btn.setUri(uri);
+            viewHolder.btn.setTime((String)ds.list.get(position).get("time"));
+            viewHolder.btn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Uri uri = ((DownloadButton)view).getUri();
+                    String serviceString = Context.DOWNLOAD_SERVICE;
+                    DownloadManager downloadManager;
+                    downloadManager = (DownloadManager) getSystemService(serviceString);
+                    DownloadManager.Request request = new DownloadManager.Request(uri);
+                    long reference = downloadManager.enqueue(request);
+                    request.setDestinationInExternalPublicDir("sdcard/Download", "BingPic"+((DownloadButton)view).getTime()+".jpg");
+                    request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+                }
+            });
 
             return convertView;
         }
@@ -198,45 +208,8 @@ public class MainActivity extends AppCompatActivity {
             SimpleDraweeView pic;
             TextView text;
             TextView time;
-            Button more;
+            DownloadButton btn;
         }
 
-        @Override
-        public void onClick(View v) {
-            int id=v.getId();
-            switch (id){
-                case R.id.btn_more:
-                    showMore();
-                    break;
-            }
-        }
-
-        private void showMore(){
-            android.app.AlertDialog.Builder builder=new android.app.AlertDialog.Builder(MainActivity.this);
-            builder.setTitle("提示");
-            builder.setMessage("这里是详情页（当然并没有做Orz）");
-            builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                }
-            });
-            android.app.AlertDialog dialog=builder.create();
-            dialog.show();
-            dialog.getButton(dialog.BUTTON_POSITIVE).setTextColor(R.color.sure);
-        }
-
-        private Bitmap getBitmap(String path) throws IOException {
-
-            URL url = new URL(path);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setConnectTimeout(5000);
-            conn.setRequestMethod("GET");
-            if (conn.getResponseCode() == 200){
-                InputStream inputStream = conn.getInputStream();
-                Bitmap bitmap = Bitmap.createScaledBitmap(BitmapFactory.decodeStream(inputStream),150,150,true);
-                return bitmap;
-            }
-            return null;
-        }
     }
 }
