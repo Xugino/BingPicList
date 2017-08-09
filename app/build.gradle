@@ -30,5 +30,7 @@ dependencies {
     compile 'com.android.support:percent:23.0.1'
     compile 'com.facebook.fresco:fresco:0.12.0'
     compile 'com.facebook.fresco:webpsupport:0.12.0'
+    compile 'com.scwang.smartrefresh:SmartRefreshLayout:1.0.3'
+    compile 'com.scwang.smartrefresh:SmartRefreshHeader:1.0.3'
     compile 'com.google.code.gson:gson:2.6.2'
 }

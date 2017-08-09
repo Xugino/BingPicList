@@ -25,7 +25,6 @@ class DataAsyncTask extends AsyncTask<Integer,Void,List<Map<String,Object>>> {
 
     private List<Map<String,Object>> list;
     private int length;
-    private String picsrc;
 
     DataAsyncTask(){
         super();
