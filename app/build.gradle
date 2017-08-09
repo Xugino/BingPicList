@@ -27,7 +27,7 @@ dependencies {
     compile 'com.android.support:appcompat-v7:26.+'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     testCompile 'junit:junit:4.12'
-    compile 'com.android.support:percent:23.0.1'
+    compile 'com.android.support:design:26.+'
     compile 'com.facebook.fresco:fresco:0.12.0'
     compile 'com.facebook.fresco:webpsupport:0.12.0'
     compile 'com.scwang.smartrefresh:SmartRefreshLayout:1.0.3'

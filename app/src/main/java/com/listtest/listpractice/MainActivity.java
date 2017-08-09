@@ -2,23 +2,25 @@ package com.listtest.listpractice;
 
 import android.content.Context;
 import android.content.DialogInterface;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.scwang.smartrefresh.header.TaurusHeader;
+import com.scwang.smartrefresh.layout.api.RefreshLayout;
+import com.scwang.smartrefresh.layout.constant.SpinnerStyle;
+import com.scwang.smartrefresh.layout.footer.BallPulseFooter;
+import com.scwang.smartrefresh.layout.listener.OnLoadmoreListener;
+import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 
 import java.lang.String;
 import java.util.ArrayList;
@@ -31,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
     private List<Map<String,Object>> mList;
     private NewListView mylist;
     private MyAdapter myadapter;
-    private SwipeRefresherView myrefresher;
+    private RefreshLayout myrefresher;
     private DataResource ds;
     private DataAsyncTask myTask;
     private int listCount;
@@ -40,36 +42,36 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.mylist_easy);
+        setContentView(R.layout.mylist);
 
         mList= new ArrayList<>();
         mylist=(NewListView)this.findViewById(R.id.list);
-        myrefresher=(SwipeRefresherView) this.findViewById(R.id.refresher);
+        myrefresher=(RefreshLayout) this.findViewById(R.id.refresher);
+        myrefresher.setRefreshHeader(new TaurusHeader(this));
+        myrefresher.setRefreshFooter(new BallPulseFooter(this).setSpinnerStyle(SpinnerStyle.Scale));
+        myrefresher.setEnableAutoLoadmore(false);
         ds=new DataResource();
         myadapter=new MyAdapter(MainActivity.this);
         mylist.setAdapter(myadapter);
-        myrefresher.setProgressBackgroundColorSchemeResource(R.color.colorPrimary);
-        myrefresher.setColorSchemeResources(R.color.colorAccent);
-
-        myrefresher.setItemCount(5);
-        myrefresher.measure(0,0);
-        myrefresher.setRefreshing(true);
 
         initEvent();
         initData();
+        myrefresher.finishRefresh(3000);
     }
 
     private void initEvent(){
-        myrefresher.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener(){
+        myrefresher.setOnRefreshListener(new OnRefreshListener(){
             @Override
-            public void onRefresh() {
+            public void onRefresh(RefreshLayout refreshLayout) {
                 initData();
+                refreshLayout.finishRefresh(3000);
             }
         });
-        myrefresher.setOnLoadMoreListener(new SwipeRefresherView.OnLoadMoreListener(){
+        myrefresher.setOnLoadmoreListener(new OnLoadmoreListener(){
             @Override
-            public void onLoadMore() {
+            public void onLoadmore(RefreshLayout refreshLayout) {
                 loadMoreData();
+                refreshLayout.finishLoadmore(3000);
             }
         });
     }
@@ -80,30 +82,26 @@ public class MainActivity extends AppCompatActivity {
             public void run() {
                 mList.clear();
                 mList.addAll(ds.getMoreData());
+                myadapter.notifyDataSetChanged();
                 if(listCount<mList.size()){
                     Toast.makeText(MainActivity.this, "加载完成", Toast.LENGTH_SHORT).show();
                     listCount=mList.size();
                 }else{
                     Toast.makeText(MainActivity.this, "没有更多了", Toast.LENGTH_SHORT).show();
                 }
-                myrefresher.setLoading(false);
             }
-        }, 3000);
+        },3000);
+
     }
 
     private void initData(){
-        new Handler().postDelayed(new Runnable(){
+        new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
                 mList.clear();
                 mList.addAll(ds.getData());
-                myadapter=new MyAdapter(MainActivity.this);
-                mylist.setAdapter(myadapter);
                 myadapter.notifyDataSetChanged();
                 Toast.makeText(MainActivity.this, "刷新成功", Toast.LENGTH_SHORT).show();
-                if (myrefresher.isRefreshing()) {
-                    myrefresher.setRefreshing(false);
-                }
             }
         },3000);
     }

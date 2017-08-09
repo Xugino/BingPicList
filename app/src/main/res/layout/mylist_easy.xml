@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <com.listtest.listpractice.SwipeRefresherView
+    <com.scwang.smartrefresh.layout.SmartRefreshLayout
         android:id="@+id/refresher"
         android:layout_height="match_parent"
         android:layout_width="match_parent">
@@ -14,5 +14,5 @@
             android:divider="@color/colorPrimary"
             android:dividerHeight="1dp">
         </com.listtest.listpractice.NewListView>
-    </com.listtest.listpractice.SwipeRefresherView>
+    </com.scwang.smartrefresh.layout.SmartRefreshLayout>
 </RelativeLayout>
