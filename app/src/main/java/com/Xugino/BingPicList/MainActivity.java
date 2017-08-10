@@ -171,7 +171,12 @@ public class MainActivity extends AppCompatActivity {
                 mList.addAll(ds.getData());
                 myadapter.notifyDataSetChanged();
                 loadingDialog.dismiss();
-                Toast.makeText(MainActivity.this, "刷新成功", Toast.LENGTH_SHORT).show();
+                if(mList.size()>0){
+                    Toast.makeText(MainActivity.this, "刷新成功", Toast.LENGTH_SHORT).show();
+                }else{
+                    Toast.makeText(MainActivity.this, "刷新失败，请检查你的网络连接！", Toast.LENGTH_LONG).show();
+                }
+
             }
         },3000);
     }
