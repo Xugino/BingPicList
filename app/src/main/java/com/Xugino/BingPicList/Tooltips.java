@@ -1,7 +1,7 @@
 /**
   * Copyright 2017 bejson.com 
   */
-package com.listtest.listpractice;
+package com.Xugino.BingPicList;
 
 /**
  * Auto-generated: 2017-08-01 17:39:46

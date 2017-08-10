@@ -7,6 +7,7 @@
     <color name="text">#000000</color>
     <color name="time">#999999</color>
     <color name="back">#ffffff</color>
+    <color name="menuBack">#eeeeee</color>
     <color name="alert">#990000</color>
     <color name="sure">#3F51B5</color>
 </resources>

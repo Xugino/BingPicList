@@ -1,7 +1,5 @@
-package com.listtest.listpractice;
+package com.Xugino.BingPicList;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.util.Log;
 

@@ -4,7 +4,7 @@ android {
     compileSdkVersion 26
     buildToolsVersion "25.0.0"
     defaultConfig {
-        applicationId "com.listtest.listpractice"
+        applicationId "com.Xugino.listpractice"
         minSdkVersion 19
         targetSdkVersion 26
         versionCode 1

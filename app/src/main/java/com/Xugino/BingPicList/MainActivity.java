@@ -1,13 +1,15 @@
-package com.listtest.listpractice;
+package com.Xugino.BingPicList;
 
 import android.app.DownloadManager;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -21,7 +23,6 @@ import com.scwang.smartrefresh.layout.footer.BallPulseFooter;
 import com.scwang.smartrefresh.layout.listener.OnLoadmoreListener;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 
-import java.io.File;
 import java.lang.String;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,11 +38,11 @@ public class MainActivity extends AppCompatActivity {
     private DataResource ds;
     private DataAsyncTask myTask;
     private int listCount;
+    private Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.mylist);
 
         mList= new ArrayList<>();
@@ -53,9 +54,49 @@ public class MainActivity extends AppCompatActivity {
         ds=new DataResource();
         myadapter=new MyAdapter(MainActivity.this);
         mylist.setAdapter(myadapter);
-
+        initToolbar();
         initEvent();
         initData();
+    }
+
+    private void initToolbar(){
+        toolbar = (Toolbar) this.findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        toolbar.setNavigationIcon(R.mipmap.navigate);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+        toolbar.setTitleTextColor(0xffffffff);
+        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()){
+                    case R.id.test:
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(MainActivity.this, "当前已经是最新版本", Toast.LENGTH_SHORT).show();
+                            }
+                        },2000);
+                        break;
+                    case R.id.exit:
+                        finish();
+                        break;
+                    default:
+                        break;
+                }
+                return true;
+            }
+        });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.toolbar_menu, menu);
+        return true;
     }
 
     private void initEvent(){

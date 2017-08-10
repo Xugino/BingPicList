@@ -1,4 +1,4 @@
-package com.listtest.listpractice;
+package com.Xugino.BingPicList;
 
 import android.content.Context;
 import android.support.v7.widget.AppCompatButton;

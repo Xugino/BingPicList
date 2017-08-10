@@ -1,4 +1,4 @@
-package com.listtest.listpractice;
+package com.Xugino.BingPicList;
 
 import android.support.annotation.RequiresApi;
 import android.content.Context;

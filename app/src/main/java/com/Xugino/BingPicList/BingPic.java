@@ -1,7 +1,7 @@
 /**
   * Copyright 2017 bejson.com 
   */
-package com.listtest.listpractice;
+package com.Xugino.BingPicList;
 import java.util.List;
 
 /**

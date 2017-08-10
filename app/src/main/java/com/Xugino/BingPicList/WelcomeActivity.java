@@ -1,4 +1,4 @@
-package com.listtest.listpractice;
+package com.Xugino.BingPicList;
 
 import android.content.Intent;
 import android.os.Bundle;

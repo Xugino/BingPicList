@@ -3,8 +3,16 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:minHeight="?attr/actionBarSize"
+        android:background="@color/colorPrimary"
+        android:theme="@style/Theme.ToolBar.My"/>
     <com.scwang.smartrefresh.layout.SmartRefreshLayout
         android:id="@+id/refresher"
+        android:layout_below="@id/toolbar"
         android:layout_height="match_parent"
         android:layout_width="match_parent">
         <ScrollView
@@ -20,13 +28,13 @@
                     android:layout_height="100dp"
                     android:scaleType="fitXY"
                     android:src="@mipmap/testimg"/>
-                <com.listtest.listpractice.NewListView
+                <com.Xugino.BingPicList.NewListView
                     android:id="@+id/list"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:divider="@color/colorPrimary"
                     android:dividerHeight="1dp">
-                </com.listtest.listpractice.NewListView>
+                </com.Xugino.BingPicList.NewListView>
             </LinearLayout>
         </ScrollView>
     </com.scwang.smartrefresh.layout.SmartRefreshLayout>
