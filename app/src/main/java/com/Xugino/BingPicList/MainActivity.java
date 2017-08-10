@@ -5,6 +5,9 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
@@ -39,11 +42,13 @@ public class MainActivity extends AppCompatActivity {
     private DataAsyncTask myTask;
     private int listCount;
     private Toolbar toolbar;
+    private DrawerLayout drawerLayout;
+    private ActionBarDrawerToggle drawerToggle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.mylist);
+        setContentView(R.layout.activity_main);
 
         mList= new ArrayList<>();
         mylist=(NewListView)this.findViewById(R.id.list);
@@ -55,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
         myadapter=new MyAdapter(MainActivity.this);
         mylist.setAdapter(myadapter);
         initToolbar();
+        initDrawerLayout();
         initEvent();
         initData();
     }
@@ -62,6 +68,8 @@ public class MainActivity extends AppCompatActivity {
     private void initToolbar(){
         toolbar = (Toolbar) this.findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setHomeButtonEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         toolbar.setNavigationIcon(R.mipmap.navigate);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
@@ -116,6 +124,13 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private void initDrawerLayout(){
+        drawerLayout=(DrawerLayout)this.findViewById(R.id.drawerLayout_left);
+        drawerToggle=new ActionBarDrawerToggle(this,drawerLayout,toolbar,R.string.open,R.string.close);
+        drawerToggle.syncState();
+        drawerLayout.setDrawerListener(drawerToggle);
+    }
+
     private void loadMoreData() {
         new Handler().postDelayed(new Runnable() {
             @Override
@@ -132,6 +147,17 @@ public class MainActivity extends AppCompatActivity {
             }
         },3000);
 
+    }
+
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if(id == android.R.id.home)
+        {
+            drawerLayout.openDrawer(GravityCompat.START);//打开侧滑菜单
+            return true ;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     private void initData(){
