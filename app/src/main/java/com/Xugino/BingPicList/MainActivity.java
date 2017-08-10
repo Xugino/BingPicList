@@ -1,6 +1,7 @@
 package com.Xugino.BingPicList;
 
 import android.app.DownloadManager;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
@@ -43,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle drawerToggle;
+    private LoadingDialog loadingDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +63,8 @@ public class MainActivity extends AppCompatActivity {
         initToolbar();
         initDrawerLayout();
         initEvent();
+        loadingDialog=new LoadingDialog(this);
+        loadingDialog.show();
         initData();
     }
 
@@ -87,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
                             public void run() {
                                 Toast.makeText(MainActivity.this, "当前已经是最新版本", Toast.LENGTH_SHORT).show();
                             }
-                        },2000);
+                        },1200);
                         break;
                     case R.id.exit:
                         finish();
@@ -130,6 +134,17 @@ public class MainActivity extends AppCompatActivity {
         drawerLayout.setDrawerListener(drawerToggle);
     }
 
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if(id == android.R.id.home)
+        {
+            drawerLayout.openDrawer(GravityCompat.START);//打开侧滑菜单
+            return true ;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
     private void loadMoreData() {
         new Handler().postDelayed(new Runnable() {
             @Override
@@ -145,19 +160,8 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         },3000);
-
     }
 
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if(id == android.R.id.home)
-        {
-            drawerLayout.openDrawer(GravityCompat.START);//打开侧滑菜单
-            return true ;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
 
     private void initData(){
         new Handler().postDelayed(new Runnable() {
@@ -166,6 +170,7 @@ public class MainActivity extends AppCompatActivity {
                 mList.clear();
                 mList.addAll(ds.getData());
                 myadapter.notifyDataSetChanged();
+                loadingDialog.dismiss();
                 Toast.makeText(MainActivity.this, "刷新成功", Toast.LENGTH_SHORT).show();
             }
         },3000);
