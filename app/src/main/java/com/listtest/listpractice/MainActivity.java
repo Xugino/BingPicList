@@ -195,9 +195,9 @@ public class MainActivity extends AppCompatActivity {
                     DownloadManager downloadManager;
                     downloadManager = (DownloadManager) getSystemService(serviceString);
                     DownloadManager.Request request = new DownloadManager.Request(uri);
-                    long reference = downloadManager.enqueue(request);
                     request.setDestinationInExternalPublicDir("sdcard/Download", "BingPic"+((DownloadButton)view).getTime()+".jpg");
                     request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+                    long reference = downloadManager.enqueue(request);
                 }
             });
 
