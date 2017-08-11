@@ -3,9 +3,18 @@
 
 这只是一个简单的**列表应用练习Demo**，可以加载 _Bing_ 每日图片的最近八张（受限于API）。
 
+## v1.1发布
+  v1.1版本发布，新功能如下：
+1. 初始化Dialog
+2. 邮件反馈功能
+3. 代码结构优化
+4. 下载功能优化
+5. 列表显示优化
+6. 界面更新
+
+</br>检查更新功能暂时停滞
+
 ## v1.0发布
-[![AppVeyor](https://img.shields.io/appveyor/ci/gruntjs/grunt.svg)]()     [![Gem](https://img.shields.io/gem/dv/rails/1.0.0.svg)]()
-  </br>
   v1.0版本正式发布，内含8月10号前所有功能。
 
 ## 20170810更新(2)
