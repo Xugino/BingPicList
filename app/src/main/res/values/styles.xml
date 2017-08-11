@@ -14,8 +14,7 @@
         <item name="android:paddingRight">2dp</item>
         <item name="actionOverflowMenuStyle">@style/ActionButton.Overflow.My</item>
     </style>
-    <style name="ActionButton.Overflow.My" parent="android:style/Widget.Holo.Light.ActionButton.Overflow">
-        <item name="android:src">@mipmap/menu</item>
+    <style name="ActionButton.Overflow.My" parent="android:style/Widget.Holo.ActionButton.Overflow">
         <item name="overlapAnchor">false</item>
     </style>
     <style name="AppTheme.DrawerArrowToggle" parent="Base.Widget.AppCompat.DrawerArrowToggle">

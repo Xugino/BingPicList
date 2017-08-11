@@ -1,10 +1,13 @@
 package com.Xugino.BingPicList;
 
 import android.app.DownloadManager;
-import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -35,16 +38,15 @@ import java.util.Map;
 public class MainActivity extends AppCompatActivity {
 
     private List<Map<String,Object>> mList;
-    private NewListView mylist;
+    NewListView mylist;
     private MyAdapter myadapter;
     private RefreshLayout myrefresher;
     private DataResource ds;
-    private DataAsyncTask myTask;
-    private int listCount;
     private Toolbar toolbar;
     private DrawerLayout drawerLayout;
-    private ActionBarDrawerToggle drawerToggle;
+    ActionBarDrawerToggle drawerToggle;
     private LoadingDialog loadingDialog;
+    private EmailInterface emailInterface;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,27 +73,36 @@ public class MainActivity extends AppCompatActivity {
     private void initToolbar(){
         toolbar = (Toolbar) this.findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setHomeButtonEnabled(true);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        toolbar.setNavigationIcon(R.mipmap.navigate);
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
-        });
         toolbar.setTitleTextColor(0xffffffff);
+        emailInterface=new EmailInterface() {
+            @Override
+            public void sendEmail(Bundle bundle) {
+                boolean result=true;
+                Intent intent=new Intent(Intent.ACTION_SENDTO);
+                intent.setData(Uri.parse("mailto:huangyiming@buaa.edu.cn"));
+                intent.putExtra(Intent.EXTRA_SUBJECT,bundle.getCharSequence("title"));
+                intent.putExtra(Intent.EXTRA_TEXT,bundle.getCharSequence("content"));
+                try{
+                    startActivity(intent);
+                }catch (Exception e){
+                    e.printStackTrace();
+                    result=false;
+                }finally {
+                    if(!result){
+                        Toast.makeText(MainActivity.this, "反馈失败，请重新尝试", Toast.LENGTH_LONG).show();
+                    }
+                }
+            }
+        };
         toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()){
                     case R.id.test:
-                        new Handler().postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(MainActivity.this, "当前已经是最新版本", Toast.LENGTH_SHORT).show();
-                            }
-                        },1200);
+                        new UpdateManager(MainActivity.this).checkUpdateInfo();
+                        break;
+                    case R.id.email:
+                        new EmailDialog(MainActivity.this,emailInterface).setDisplay();
                         break;
                     case R.id.exit:
                         finish();
@@ -131,7 +142,7 @@ public class MainActivity extends AppCompatActivity {
         drawerLayout=(DrawerLayout)this.findViewById(R.id.drawerLayout_left);
         drawerToggle=new ActionBarDrawerToggle(this,drawerLayout,toolbar,R.string.open,R.string.close);
         drawerToggle.syncState();
-        drawerLayout.setDrawerListener(drawerToggle);
+        drawerLayout.addDrawerListener(drawerToggle);
     }
 
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -152,9 +163,9 @@ public class MainActivity extends AppCompatActivity {
                 mList.clear();
                 mList.addAll(ds.getMoreData());
                 myadapter.notifyDataSetChanged();
-                if(listCount<mList.size()){
+                if(ds.listCount<mList.size()){
                     Toast.makeText(MainActivity.this, "加载完成", Toast.LENGTH_SHORT).show();
-                    listCount=mList.size();
+                    ds.listCount=mList.size();
                 }else{
                     Toast.makeText(MainActivity.this, "没有更多了", Toast.LENGTH_SHORT).show();
                 }
@@ -181,47 +192,14 @@ public class MainActivity extends AppCompatActivity {
         },3000);
     }
 
-    private class DataResource {
 
-        private List<Map<String,Object>> list;
-        private int page;
-
-        private DataResource(){
-            list=new ArrayList<>();
-        }
-
-        private List<Map<String,Object>> getData()
-        {
-            list.clear();
-            page=1;
-            try{
-                myTask = new DataAsyncTask();
-                list.addAll(myTask.execute(page).get());
-            }catch (Exception e){
-                e.printStackTrace();
-            }
-            listCount=list.size();
-            return list;
-        }
-        private List<Map<String,Object>> getMoreData()
-        {
-            page=page+1;
-            try{
-                myTask = new DataAsyncTask();
-                list.addAll(myTask.execute(page).get());
-            }catch (Exception e){
-                e.printStackTrace();
-            }
-            return list;
-        }
-    }
 
 
     private class MyAdapter extends BaseAdapter
     {
         Context mContext;
-        DownloadButton btn;
         private LayoutInflater mInflater;
+        private boolean isDownloading;
 
         private MyAdapter(Context mContext){
             this.mContext=mContext;
@@ -260,24 +238,42 @@ public class MainActivity extends AppCompatActivity {
             Uri uri = Uri.parse((String)ds.list.get(position).get("pic"));
             viewHolder.pic.setImageURI(uri);
             viewHolder.text.setText((CharSequence)ds.list.get(position).get("text"));
-            viewHolder.time.setText((CharSequence)ds.list.get(position).get("time"));
+            viewHolder.time.setText(getTime((String)ds.list.get(position).get("time")));
+            isDownloading=false;
+            CompleteReceiver completeReceiver = new CompleteReceiver();
+            registerReceiver(completeReceiver,new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
             viewHolder.btn.setUri(uri);
             viewHolder.btn.setTime((String)ds.list.get(position).get("time"));
             viewHolder.btn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Uri uri = ((DownloadButton)view).getUri();
-                    String serviceString = Context.DOWNLOAD_SERVICE;
-                    DownloadManager downloadManager;
-                    downloadManager = (DownloadManager) getSystemService(serviceString);
-                    DownloadManager.Request request = new DownloadManager.Request(uri);
-                    request.setDestinationInExternalPublicDir("sdcard/Download", "BingPic"+((DownloadButton)view).getTime()+".jpg");
-                    request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-                    long reference = downloadManager.enqueue(request);
+                    if(isDownloading){
+                        Toast.makeText(MainActivity.this, "当前已在进行下载，请等待下载完成", Toast.LENGTH_LONG).show();
+                    }else{
+                        Toast.makeText(MainActivity.this, "开始下载...", Toast.LENGTH_SHORT).show();
+                        isDownloading=true;
+                        Uri uri = ((DownloadButton)view).getUri();
+                        DownloadManager downloadManager;
+                        downloadManager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
+                        DownloadManager.Request request = new DownloadManager.Request(uri);
+                        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "BingPic"+((DownloadButton)view).getTime()+".jpg");
+                        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+                        long reference = downloadManager.enqueue(request);
+                    }
+
                 }
             });
-
             return convertView;
+        }
+
+        private String getTime(String time){
+            StringBuilder stringBuilder=new StringBuilder(time);
+            stringBuilder.insert(8,"日");
+            if(stringBuilder.charAt(6)=='0') stringBuilder.deleteCharAt(6);
+            stringBuilder.insert(6,"月");
+            if(stringBuilder.charAt(4)=='0') stringBuilder.deleteCharAt(4);
+            stringBuilder.insert(4,"年");
+            return stringBuilder.toString();
         }
 
         class ViewHolder{
@@ -287,5 +283,18 @@ public class MainActivity extends AppCompatActivity {
             DownloadButton btn;
         }
 
+        class CompleteReceiver extends BroadcastReceiver {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if(isDownloading){
+                    Toast.makeText(MainActivity.this, "图片下载完成", Toast.LENGTH_SHORT).show();
+                    isDownloading=false;
+                }
+            }
+        }
+    }
+
+    interface EmailInterface{
+        void sendEmail(Bundle bundle);
     }
 }
